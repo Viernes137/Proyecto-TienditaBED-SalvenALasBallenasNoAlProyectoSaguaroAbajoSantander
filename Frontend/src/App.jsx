@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import A from './Components/Forms'
+import Datos from './Components/Formulario'
 import './App.css'
 
 function App() {
 
   return (
     <div>
-      <A/>
+      <Datos/>
     </div>
   )
 }

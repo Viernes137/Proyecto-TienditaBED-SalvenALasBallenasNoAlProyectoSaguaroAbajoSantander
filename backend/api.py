@@ -1,6 +1,8 @@
-from fastapi import FastAPI, Form
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi import FastAPI, Form, Request
+from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware  
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from dotenv import load_dotenv
 import mysql.connector
 import os
@@ -18,13 +20,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-db = mysql.connector.connect(
-    host=os.getenv("DB_HOST"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    database=os.getenv("DB_NAME"),
-    port=int(os.getenv("DB_PORT"))
-)
+def con_base():
+    try:
+        connection = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
+            port=int(os.getenv("DB_PORT", "3306")),  # Puerto por defecto 3306
+            autocommit=True 
+        )
+        return connection
+    except mysql.connector.Error as err:
+        print(f"Error al conectar a la base de datos: {err}")
+        raise  
 
 @app.get("/")
 def read_root():
@@ -32,29 +41,49 @@ def read_root():
 
 @app.post("/Tablas")
 def guardar_reporte(Consulta: str = Form(...)):
-    #db_connection = None  
+    db = None
     try:
-        ''' db_connection = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-            port=int(os.getenv("DB_PORT"))
-        ) '''
-        
-        cursor = db.cursor(dictionary=True)
-        cursor.execute(Consulta)
-        datos = cursor.fetchall()
-        cursor.close()
-
+        db = con_base()
+        with db.cursor(dictionary=True) as cursor:
+            cursor.execute(Consulta)
+            datos = cursor.fetchall()
         return {"query": Consulta, "resultado": datos}
 
     except mysql.connector.Error as err:
         return JSONResponse(
             status_code=500, 
-            content={"message": f"Database error: {err}"}
+            content={"error": f"Error en la base de datos: {err}"}
         )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Error inesperado: {str(e)}"}
+        )
+    finally:
+        if db and db.is_connected():
+            db.close()
 
+
+@app.get("/P1")
+def listar_empleados():
+    db = None
+    try:
+        db = con_base()
+        with db.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT * FROM empleados")
+            datos = cursor.fetchall()
+        return {"query": "SELECT * FROM empleados", "resultado": datos}
+
+    except mysql.connector.Error as err:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Error al obtener empleados: {err}"}
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Error inesperado: {str(e)}"}
+        )
     finally:
         if db and db.is_connected():
             db.close()

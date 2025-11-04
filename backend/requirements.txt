@@ -1,0 +1,18 @@
+# Framework web - FastAPI
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+
+# Base de datos MySQL
+mysql-connector-python==9.1.0
+
+# CORS
+# (FastAPI tiene CORS incluido)
+
+# Variables de entorno
+python-dotenv==1.0.1
+
+# Validación
+pydantic==2.10.0
+
+# Utilidades
+requests==2.32.0

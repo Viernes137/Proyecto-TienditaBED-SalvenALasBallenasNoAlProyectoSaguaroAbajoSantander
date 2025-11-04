@@ -14,7 +14,7 @@ services:
       - ./backend/database/sql_insert_tiendas.sql:/docker-entrypoint-initdb.d/02_sql_insert_tiendas.sql
       - mysql_data:/var/lib/mysql
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "3307:3306"  # ✅ Host:Container (usa 3307 en tu PC, 3306 dentro)
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-Password123_*}"]
       interval: 10s
@@ -35,9 +35,9 @@ services:
       DB_USER: ${DB_USER:-root}
       DB_PASSWORD: ${DB_PASSWORD:-Password123_*}
       DB_NAME: ${DB_NAME:-Changarros}
-      DB_PORT: 3306
+      DB_PORT: 3306  # ✅ Puerto interno del contenedor MySQL
     ports:
-      - "8000:8000"
+      - "8001:8000"  # ✅ Host:Container (usa 8001 en tu PC, 8000 dentro)
     volumes:
       - ./backend:/app
       - ./backend/static:/app/static
@@ -55,9 +55,9 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: changarros_frontend
     environment:
-      VITE_API_URL: http://localhost:8000
+      VITE_API_URL: http://localhost:8001  # ✅ Usa el puerto del host
     ports:
-      - "5173:5173"
+      - "5174:5173"  # ✅ Host:Container (usa 5174 en tu PC, 5173 dentro)
     volumes:
       - ./Frontend:/app
       - /app/node_modules

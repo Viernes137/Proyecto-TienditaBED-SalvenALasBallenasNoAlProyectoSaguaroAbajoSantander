@@ -8,7 +8,7 @@ export default function RadarChartComponent({ radarData, selectedDay }) {
       {radarData.length > 0 ? (
         <>
           <h3 className="text-base font-bold text-teal-700 mb-5">
-            📊 Métricas Día {selectedDay || 'N/A'}
+             Métricas Día {selectedDay || 'N/A'}
           </h3>
           <ResponsiveContainer width="100%" height={280}>
             <RadarChart data={radarData}>

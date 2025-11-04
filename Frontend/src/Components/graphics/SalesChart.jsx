@@ -8,7 +8,7 @@ export default function SalesChart({ ventasHorarias, selectedDay }) {
       {ventasHorarias.length > 0 ? (
         <>
           <h3 className="text-base font-bold text-teal-700 mb-4">
-            📈 Ventas por Hora - Día {selectedDay || 'N/A'}
+             Ventas por Hora - Día {selectedDay || 'N/A'}
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={ventasHorarias}>

@@ -1,43 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const Formulario = () => {
-    const [sql, setSql] = useState("");
-    const [resultado, setResultado] = useState([]);
+const Formulario = ({ consulta, onResultado }) => {
+    const [cargando, setCargando] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault(); // evita que la página se recargue
+    useEffect(() => {
+        if (consulta) {
+            obtenerDatos();
+        }
+    }, [consulta]);
+
+    const obtenerDatos = async () => {
+        setCargando(true);
+        
         const formData = new FormData();
-        formData.append("Consulta", sql);
+        formData.append("Consulta", consulta);
 
-        const res = await fetch("http://127.0.0.1:8000/Tablas", {
-            method: "POST",
-            body: formData,
-        });
+        try {
+            const res = await fetch("http://127.0.0.1:8000/Tablas", {
+                method: "POST",
+                body: formData,
+            });
 
-        const data = await res.json();
-        setResultado(data);
+            const data = await res.json();
+            
+            if (onResultado && data.resultado) {
+                onResultado(data.resultado);
+            }
+        } catch (error) {
+            console.error("Error al consultar:", error);
+            if (onResultado) {
+                onResultado([]);
+            }
+        } finally {
+            setCargando(false);
+        }
     };
 
-    return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="sql">Consulta SQL:</label>
-                <textarea
-                    id="sql"
-                    rows="4"
-                    cols="50"
-                    value={sql}
-                    onChange={(e) => setSql(e.target.value)}
-                ></textarea>
-                <button type="submit">Enviar</button>
-            </form>
-
-            <div>
-                <h3>Resultado:</h3>
-                <pre>{JSON.stringify(resultado, null, 2)}</pre>
-            </div>
-        </div>
-    );
+    // Este componente NO renderiza nada visible
+    return null;
 };
 
 export default Formulario;

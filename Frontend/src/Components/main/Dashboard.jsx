@@ -2,24 +2,23 @@ import React, { useState } from 'react';
 import Sidebar from '../common/sidebar.jsx';
 import Header from '../common/header.jsx';
 import KPICards from '../graphics/KPIcards.jsx';
-import Calendar from '../common/calendar.jsx';
 import SalesChart from '../graphics/SalesChart.jsx';
 import RadarChart from '../graphics/RadarChart.jsx';
 import PieChartComponent from '../graphics/PieChartComponent.jsx';
+import MapaTiendas from '../graphics/MapaTiendas.jsx';
 
 export default function ChangarrosDashboard() {
   const [currentMonth, setCurrentMonth] = useState(new Date(2024, 9));
   const [selectedDay, setSelectedDay] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Estados vacíos para datos
+  // Estados para datos
   const [ventasPorDia, setVentasPorDia] = useState([]);
   const [ventasHorarias, setVentasHorarias] = useState([]);
   const [tiendas, setTiendas] = useState([]);
-  const [inventario, setInventario] = useState([]);
   const [radarData, setRadarData] = useState([]);
-  const [ventasDelMes, setVentasDelMes] = useState({});
 
+  // Cálculos para KPIs
   const distribucionVentas = tiendas.map(t => ({
     name: t.nombre,
     value: t.ventas
@@ -45,19 +44,13 @@ export default function ChangarrosDashboard() {
             totalClientes={totalClientes}
           />
 
-
-            <div className="xl:col-span-2 order-1 xl:order-2">
-              <SalesChart ventasHorarias={ventasHorarias} selectedDay={selectedDay} />
-            </div>
-          </div>
-
-          {/* Sección de Gráficos Radar y Pie */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <RadarChart radarData={radarData} selectedDay={selectedDay} />
-            <PieChartComponent distribucionVentas={distribucionVentas} />
+          {/* Mapa de Tiendas */}
+          <div className="mb-6 sm:mb-8">
+            <MapaTiendas />
           </div>
 
         </div>
       </div>
+    </div>
   );
 }

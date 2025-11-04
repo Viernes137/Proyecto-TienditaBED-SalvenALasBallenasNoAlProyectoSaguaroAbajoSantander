@@ -89,4 +89,4 @@ CREATE TABLE detalles_ventas (
     FOREIGN KEY (id_particular) REFERENCES producto_tienda(id_particular)
 );
 
-#DROP DATABASE Changarros;
+-- DROP DATABASE Changarros;

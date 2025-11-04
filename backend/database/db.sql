@@ -4,13 +4,13 @@ USE Changarros;
 CREATE TABLE tiendas (
     id_tienda VARCHAR(50) PRIMARY KEY NOT NULL,
     nombre_t VARCHAR(255),
-    telefono_t VARCHAR(20),
+    telefono_t VARCHAR(10),
     fecha_apertura DATETIME,
     estado_t VARCHAR(100),
     colonia_t VARCHAR(100),
     direccion_t VARCHAR(255),
     horario_operacion VARCHAR(100),
-    tipo_t VARCHAR(100),
+    tipo_t VARCHAR(100),    
     descripcion_t TEXT
 );
 
@@ -18,14 +18,13 @@ CREATE TABLE productos (
     id_producto VARCHAR(50) PRIMARY KEY NOT NULL,
     nombre_prd VARCHAR(255),
     descripcion_prd TEXT,
-    categoria VARCHAR(100),
-    procedencia VARCHAR(100)
+    categoria VARCHAR(100)
 );
 
 CREATE TABLE provedores (
     id_provedor VARCHAR(50) PRIMARY KEY NOT NULL,
     nombre_prv VARCHAR(255),
-    telefono_prv VARCHAR(20),
+    telefono_prv VARCHAR(10),
     correo_prv VARCHAR(255)
 );
 
@@ -34,9 +33,9 @@ CREATE TABLE empleados (
     id_tienda VARCHAR(50) NOT NULL,
     nombre_emp VARCHAR(255),
     puesto VARCHAR(100),
-    salario INT,
+    salario DECIMAL(10,2),
     curp VARCHAR(20),
-    telefono_emp VARCHAR(20),
+    telefono_emp VARCHAR(10),
     correo_emp VARCHAR(255),
     FOREIGN KEY (id_tienda) REFERENCES tiendas(id_tienda)
 );
@@ -53,7 +52,7 @@ CREATE TABLE producto_tienda (
 
 CREATE TABLE precio_compra (
     id_particular VARCHAR(50) NOT NULL,
-    precio_compra INT,
+    precio_compra DECIMAL(10,2),
     fecha_ini DATETIME,
     fecha_fin DATETIME,
     FOREIGN KEY (id_particular) REFERENCES producto_tienda(id_particular)
@@ -61,7 +60,7 @@ CREATE TABLE precio_compra (
 
 CREATE TABLE precio_venta (
     id_particular VARCHAR(50) NOT NULL,
-    precio_venta INT,
+    precio_venta DECIMAL(10,2),
     fecha_ini DATETIME,
     fecha_fin DATETIME,
     FOREIGN KEY (id_particular) REFERENCES producto_tienda(id_particular)
@@ -77,7 +76,9 @@ CREATE TABLE inventario (
 CREATE TABLE ventas (
     id_venta VARCHAR(50) PRIMARY KEY NOT NULL,
     fecha_transaccion DATETIME,
-    tipo VARCHAR(50)
+    id_empleado VARCHAR(50) NOT NULL,
+    tipo VARCHAR(50),
+    FOREIGN KEY (id_empleado) REFERENCES empleados(id_empleado)
 );
 
 CREATE TABLE detalles_ventas (

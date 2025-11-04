@@ -27,7 +27,7 @@ def con_base():
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             database=os.getenv("DB_NAME"),
-            port=int(os.getenv("DB_PORT", "3306")),  # Puerto por defecto 3306
+            port=int(os.getenv("DB_PORT", "3306")),
             autocommit=True 
         )
         return connection
@@ -49,11 +49,6 @@ def guardar_reporte(Consulta: str = Form(...)):
             datos = cursor.fetchall()
         return {"query": Consulta, "resultado": datos}
 
-    except mysql.connector.Error as err:
-        return JSONResponse(
-            status_code=500, 
-            content={"error": f"Error en la base de datos: {err}"}
-        )
     except Exception as e:
         return JSONResponse(
             status_code=500,
@@ -74,11 +69,6 @@ def listar_empleados():
             datos = cursor.fetchall()
         return {"query": "SELECT * FROM empleados", "resultado": datos}
 
-    except mysql.connector.Error as err:
-        return JSONResponse(
-            status_code=500,
-            content={"error": f"Error al obtener empleados: {err}"}
-        )
     except Exception as e:
         return JSONResponse(
             status_code=500,

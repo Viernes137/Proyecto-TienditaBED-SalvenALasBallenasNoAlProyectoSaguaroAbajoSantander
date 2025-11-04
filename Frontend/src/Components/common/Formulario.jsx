@@ -16,7 +16,7 @@ const Formulario = ({ consulta, onResultado }) => {
         formData.append("Consulta", consulta);
 
         try {
-            const res = await fetch("http://127.0.0.1:8001/Tablas", {
+            const res = await fetch("http://127.0.0.1:8000/Tablas", {
                 method: "POST",
                 body: formData,
             });
@@ -35,8 +35,6 @@ const Formulario = ({ consulta, onResultado }) => {
             setCargando(false);
         }
     };
-
-    // Este componente NO renderiza nada visible
     return null;
 };
 

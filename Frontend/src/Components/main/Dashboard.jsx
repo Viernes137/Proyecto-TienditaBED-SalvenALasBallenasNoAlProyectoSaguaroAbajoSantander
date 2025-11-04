@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import Sidebar from '../common/Sidebar.jsx';
+import Sidebar from '../common/sidebar.jsx';
 import Header from '../common/header.jsx';
-import KPICards from '../graphics/KPICards.jsx';
-import SalesChart from '../graphics/SalesChart.jsx';
-import RadarChart from '../graphics/RadarChart.jsx';
-import PieChartComponent from '../graphics/PieChartComponent.jsx';
-import MapaTiendas from '../graphics/MapaTiendas.jsx';
+import KPICards from '../graphics/KPIcards.jsx';
+import GraficaBurbujas from '../graphics/Burbuja.jsx';
+import StreamGraphCategorias from '../graphics/StreamGraphCategorias.jsx';
+import HeatmapVentas from '../graphics/HeatmapVentas.jsx';
+import PolarChartVentas from '../graphics/PolarChartVentas.jsx';
+import TopProductos from '../graphics/TopProductos.jsx';
 
 export default function ChangarrosDashboard() {
   const [currentMonth, setCurrentMonth] = useState(new Date(2024, 9));
@@ -44,9 +45,25 @@ export default function ChangarrosDashboard() {
             totalClientes={totalClientes}
           />
 
-          {/* Mapa de Tiendas */}
-          <div className="mb-6 sm:mb-8">
-            <MapaTiendas />
+          {/* Gráfica de Burbujas existente */}
+          <div className="mt-6">
+            <GraficaBurbujas />
+          </div>
+
+          {/* Top 10 Productos */}
+          <div className="mt-6">
+            <TopProductos />
+          </div>
+
+          {/* Grid con 2 columnas para gráficas medianas */}
+          <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <HeatmapVentas />
+            <PolarChartVentas />
+          </div>
+
+          {/* StreamGraph a ancho completo */}
+          <div className="mt-6">
+            <StreamGraphCategorias />
           </div>
 
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Home, Store, Package, Target, Award, Settings, Menu, ChevronLeft, ShoppingCart, TrendingUp, ChevronDown, ChevronRight } from 'lucide-react';
-import Formulario from '../Formulario.jsx';
+import Formulario from '../common/Formulario';
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [tiendasOpen, setTiendasOpen] = useState(false);

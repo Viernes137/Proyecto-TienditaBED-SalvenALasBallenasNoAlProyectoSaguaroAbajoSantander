@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Navigation, MapPin } from "lucide-react";
-import Formulario from "../Formulario";
+import Formulario from "../common/Formulario";
 
 const MapControls = ({ onZoomIn, onZoomOut, onLocateMe }) => {
   return (

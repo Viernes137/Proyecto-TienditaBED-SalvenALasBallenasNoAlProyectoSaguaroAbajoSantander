@@ -48,7 +48,7 @@ services:
       - app-network
     restart: unless-stopped
 
-  # Frontend React
+  # Frontend React (Modo Desarrollo)
   frontend:
     build:
       context: .
@@ -57,7 +57,10 @@ services:
     environment:
       VITE_API_URL: http://localhost:8000
     ports:
-      - "80:80"
+      - "5173:5173"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
     networks:

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Sidebar from '../common/sidebar.jsx';
+import Sidebar from '../common/Sidebar.jsx';
 import Header from '../common/header.jsx';
-import KPICards from '../graphics/KPIcards.jsx';
+import KPICards from '../graphics/KPICards.jsx';
 import SalesChart from '../graphics/SalesChart.jsx';
 import RadarChart from '../graphics/RadarChart.jsx';
 import PieChartComponent from '../graphics/PieChartComponent.jsx';

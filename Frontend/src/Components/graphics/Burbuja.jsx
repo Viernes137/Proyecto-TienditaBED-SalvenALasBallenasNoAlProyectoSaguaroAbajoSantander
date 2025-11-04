@@ -54,10 +54,14 @@ const GraficaBurbujas = () => {
     };
 
     const colores = [
-        { bg: "#6B7280" },
-        { bg: "#F59E0B" },
-        { bg: "#10B981" },
-        { bg: "#EF4444" },
+        "#60A5FA",
+        "#34D399", 
+        "#FBBF24",
+        "#F87171",
+        "#A78BFA",
+        "#FB923C",
+        "#4ADE80",
+        "#F472B6"
     ];
 
     if (cargando) {
@@ -112,19 +116,6 @@ const GraficaBurbujas = () => {
     }
 
     const maxProductos = Math.max(...datos.map(d => d.total_productos || 0), 1);
-    const maxVentas = Math.max(...datos.map(d => d.num_ventas || 0), 1);
-
-    const calcularTamano = (productos) => {
-        const minSize = 40;
-        const maxSize = 180;
-        return minSize + (productos / maxProductos) * (maxSize - minSize);
-    };
-
-    const calcularPosicion = (ventas, index, total) => {
-        const baseX = (ventas / maxVentas) * 70 + 10;
-        const offsetY = ((index / total) * 60) + 10;
-        return { x: baseX, y: offsetY };
-    };
 
     return (
         <div className="bg-white rounded-lg p-6 shadow-sm">
@@ -132,78 +123,145 @@ const GraficaBurbujas = () => {
                 Gráfica de burbujas: Que tienda vende más (ya sea en productos o en cantidad)
             </h3>
             
-            <div className="relative w-full h-96 bg-gray-50 rounded-lg overflow-hidden">
-                <svg className="w-full h-full">
+            <div className="relative w-full" style={{ height: '500px' }}>
+                <svg className="w-full h-full" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        {datos.map((_, index) => (
+                            <filter key={`shadow-${index}`} id={`shadow-${index}`} x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                <feOffset dx="0" dy="2" result="offsetblur"/>
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.3"/>
+                                </feComponentTransfer>
+                                <feMerge>
+                                    <feMergeNode/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        ))}
+                    </defs>
+                    
                     {datos.map((item, index) => {
-                        const tamano = calcularTamano(item.total_productos);
-                        const pos = calcularPosicion(item.num_ventas, index, datos.length);
+                        const totalItems = datos.length;
+                        const padding = 100;
+                        const usableWidth = 1000 - (padding * 2);
+                        const usableHeight = 500 - (padding * 2);
+                        
+                        let x, y;
+                        
+                        if (totalItems === 1) {
+                            x = 500;
+                            y = 250;
+                        } else if (totalItems === 2) {
+                            x = padding + (index * usableWidth);
+                            y = 250;
+                        } else if (totalItems === 3) {
+                            const positions = [
+                                { x: 300, y: 250 },
+                                { x: 700, y: 150 },
+                                { x: 700, y: 350 }
+                            ];
+                            x = positions[index].x;
+                            y = positions[index].y;
+                        } else if (totalItems === 4) {
+                            const col = index % 2;
+                            const row = Math.floor(index / 2);
+                            x = padding + 150 + (col * (usableWidth - 300));
+                            y = padding + 50 + (row * (usableHeight - 100));
+                        } else {
+                            const itemsPerRow = Math.ceil(Math.sqrt(totalItems));
+                            const col = index % itemsPerRow;
+                            const row = Math.floor(index / itemsPerRow);
+                            const totalRows = Math.ceil(totalItems / itemsPerRow);
+                            
+                            const horizontalSpacing = usableWidth / (itemsPerRow + 1);
+                            const verticalSpacing = usableHeight / (totalRows + 1);
+                            
+                            x = padding + (col + 1) * horizontalSpacing;
+                            y = padding + (row + 1) * verticalSpacing;
+                        }
+                        
+                        const ratio = item.total_productos / maxProductos;
+                        const minRadius = 35;
+                        const maxRadius = 85;
+                        const radius = minRadius + (ratio * (maxRadius - minRadius));
+                        
                         const color = colores[index % colores.length];
 
                         return (
                             <g key={index}>
                                 <circle
-                                    cx={`${pos.x}%`}
-                                    cy={`${pos.y}%`}
-                                    r={tamano / 2}
-                                    fill={color.bg}
-                                    opacity="0.8"
+                                    cx={x}
+                                    cy={y}
+                                    r={radius}
+                                    fill={color}
+                                    opacity="0.9"
                                     className="transition-all duration-300 cursor-pointer hover:opacity-100"
-                                    style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))' }}
+                                    filter={`url(#shadow-${index})`}
                                 >
-                                    <title>{`${item.tienda}\nVentas: ${item.num_ventas}\nProductos: ${item.total_productos}`}</title>
+                                    <title>{`${item.tienda}\nVentas: ${item.num_ventas}\nProductos vendidos: ${item.total_productos}`}</title>
                                 </circle>
+                                
                                 <text
-                                    x={`${pos.x}%`}
-                                    y={`${pos.y}%`}
+                                    x={x}
+                                    y={y - 8}
                                     textAnchor="middle"
                                     dominantBaseline="middle"
-                                    className="text-white font-semibold text-sm pointer-events-none"
-                                    style={{ fontSize: Math.max(10, tamano / 8) }}
+                                    className="font-bold pointer-events-none select-none"
+                                    style={{ 
+                                        fontSize: Math.min(16, radius / 3.5),
+                                        fill: '#ffffff',
+                                    }}
                                 >
-                                    {item.tienda}
+                                    {item.tienda.length > 22 ? item.tienda.substring(0, 19) + '...' : item.tienda}
+                                </text>
+                                
+                                <text
+                                    x={x}
+                                    y={y + 12}
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    className="font-semibold pointer-events-none select-none"
+                                    style={{ 
+                                        fontSize: Math.min(14, radius / 4),
+                                        fill: '#ffffff',
+                                        opacity: 0.95
+                                    }}
+                                >
+                                    {item.total_productos} productos
                                 </text>
                             </g>
                         );
                     })}
                 </svg>
-
-                <div className="absolute bottom-2 left-2 text-xs text-gray-500">
-                    Q1
-                </div>
-                <div className="absolute bottom-2 right-2 text-xs text-gray-500 flex items-center gap-1">
-                    Q4
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <rect x="2" y="2" width="12" height="12" rx="2" fill="#E5E7EB"/>
-                    </svg>
-                </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-4 justify-center">
-                {datos.slice(0, 4).map((item, index) => (
-                    <div key={index} className="flex items-center gap-2">
+            <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                {datos.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-full border border-gray-200">
                         <div
                             className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: colores[index % colores.length].bg }}
+                            style={{ backgroundColor: colores[index % colores.length] }}
                         />
-                        <span className="text-xs text-gray-600 font-medium">
+                        <span className="text-sm text-gray-700 font-medium">
                             {item.tienda}
                         </span>
                     </div>
                 ))}
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-4 text-center text-xs text-gray-600">
-                <div>
+            <div className="mt-6 grid grid-cols-3 gap-4 text-center text-sm">
+                <div className="bg-gray-50 p-3 rounded-lg">
                     <div className="font-semibold text-gray-800">Total Tiendas</div>
-                    <div>{datos.length}</div>
+                    <div className="text-2xl font-bold text-gray-900 mt-1">{datos.length}</div>
                 </div>
-                <div>
+                <div className="bg-gray-50 p-3 rounded-lg">
                     <div className="font-semibold text-gray-800">Total Ventas</div>
-                    <div>{datos.reduce((acc, d) => acc + (d.num_ventas || 0), 0)}</div>
+                    <div className="text-2xl font-bold text-gray-900 mt-1">{datos.reduce((acc, d) => acc + (d.num_ventas || 0), 0)}</div>
                 </div>
-                <div>
+                <div className="bg-gray-50 p-3 rounded-lg">
                     <div className="font-semibold text-gray-800">Total Productos</div>
-                    <div>{datos.reduce((acc, d) => acc + (d.total_productos || 0), 0)}</div>
+                    <div className="text-2xl font-bold text-gray-900 mt-1">{datos.reduce((acc, d) => acc + (d.total_productos || 0), 0)}</div>
                 </div>
             </div>
         </div>

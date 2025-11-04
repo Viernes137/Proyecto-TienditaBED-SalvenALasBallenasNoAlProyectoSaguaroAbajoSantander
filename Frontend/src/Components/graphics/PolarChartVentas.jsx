@@ -5,23 +5,19 @@ import Formulario from '../common/Formulario';
 export default function PolarChartVentas() {
   const [datos, setDatos] = useState([]);
 
-  const consulta = `
-    SELECT 
-      HOUR(fecha_transaccion) as hora,
-      COUNT(*) as num_ventas,
-      SUM(total) as monto_total
-    FROM ventas
-    GROUP BY HOUR(fecha_transaccion)
-    ORDER BY hora
-  `;
+  const consulta = `SELECT 
+    HOUR(fecha_transaccion) as hora,
+    COUNT(*) as num_ventas
+FROM ventas
+GROUP BY HOUR(fecha_transaccion)
+ORDER BY hora`;
 
   const procesarDatos = (resultado) => {
     if (!resultado || resultado.length === 0) return;
     
     const datosFormateados = resultado.map(row => ({
       hora: `${row.hora}:00`,
-      ventas: row.num_ventas,
-      monto: Math.round(row.monto_total || 0)
+      ventas: row.num_ventas
     }));
     
     setDatos(datosFormateados);
@@ -49,13 +45,6 @@ export default function PolarChartVentas() {
             stroke="#8B5CF6"
             fill="#8B5CF6"
             fillOpacity={0.6}
-          />
-          <Radar
-            name="Monto Total ($)"
-            dataKey="monto"
-            stroke="#10B981"
-            fill="#10B981"
-            fillOpacity={0.5}
           />
           <Legend />
           <Tooltip 

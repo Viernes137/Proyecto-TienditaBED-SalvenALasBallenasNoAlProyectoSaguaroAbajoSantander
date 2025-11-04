@@ -1,8 +1,7 @@
-// ChangarrosDashboard.jsx
 import React, { useState } from 'react';
 import Sidebar from '../common/sidebar.jsx';
 import Header from '../common/header.jsx';
-import KPICards from '../graphics/KPIcards.jsx'; // Ya no necesita props
+import KPICards from '../graphics/KPIcards.jsx';
 import GraficaBurbujas from '../graphics/Burbuja.jsx';
 import StreamGraphCategorias from '../graphics/StreamGraphCategorias.jsx';
 import HeatmapVentas from '../graphics/HeatmapVentas.jsx';
@@ -22,29 +21,53 @@ export default function ChangarrosDashboard() {
     switch(vistaActual) {
       case 'dashboard':
         return (
-          <>
-            <Header />
-            
-            {/* KPICards ahora maneja sus propias consultas */}
-            <KPICards />
-
-            <div className="mt-6">
-              <GraficaBurbujas />
+          <div className="min-h-screen">
+            {/* Header Section */}
+            <div className="mb-8">
+              <Header />
             </div>
 
-            <div className="mt-6">
-              <TopProductos />
+            {/* KPI Cards Section */}
+            <div className="mb-10">
+              <KPICards />
             </div>
 
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <HeatmapVentas />
-              <PolarChartVentas />
-            </div>
+            {/* Main Content Grid */}
+            <div className="space-y-8">
+              
+              {/* Top Products - Full Width */}
+              <div className="w-full">
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                  <TopProductos />
+                </div>
+              </div>
 
-            <div className="mt-6">
-              <StreamGraphCategorias />
+              {/* Bubble Chart - Full Width */}
+              <div className="w-full">
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                  <GraficaBurbujas />
+                </div>
+              </div>
+
+              {/* Two Column Section: Heatmap & Polar */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                  <HeatmapVentas />
+                </div>
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                  <PolarChartVentas />
+                </div>
+              </div>
+
+              {/* Stream Graph - Full Width */}
+              <div className="w-full">
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                  <StreamGraphCategorias />
+                </div>
+              </div>
+
             </div>
-          </>
+          </div>
         );
       
       case 'tiendas':
@@ -52,16 +75,18 @@ export default function ChangarrosDashboard() {
       
       default:
         return (
-          <>
-            <Header />
+          <div className="min-h-screen">
+            <div className="mb-8">
+              <Header />
+            </div>
             <KPICards />
-          </>
+          </div>
         );
     }
   };
 
   return (
-    <div className="flex bg-gradient-to-br from-orange-50 to-yellow-50 min-h-screen font-system">
+    <div className="flex bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 min-h-screen font-system">
       <Sidebar 
         sidebarOpen={sidebarOpen} 
         setSidebarOpen={setSidebarOpen}
@@ -69,8 +94,8 @@ export default function ChangarrosDashboard() {
         vistaActual={vistaActual}
       />
       
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex-1 overflow-y-auto h-screen">
+        <div className="max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 py-8">
           {renderVista()}
         </div>
       </div>

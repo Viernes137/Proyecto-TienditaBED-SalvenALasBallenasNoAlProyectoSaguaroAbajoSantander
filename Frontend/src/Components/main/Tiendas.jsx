@@ -44,7 +44,6 @@ function Tiendas() {
       setCargando(true);
       const idTienda = tiendaSeleccionada.id_tienda;
       
-      // Consulta para estadísticas generales
       setConsultaEstadisticas(`
         SELECT 
           COUNT(DISTINCT pt.id_producto) as total_productos,
@@ -56,7 +55,6 @@ function Tiendas() {
         WHERE pt.id_tienda = '${idTienda}'
       `);
       
-      // Consulta para inventario por categoría
       setConsultaInventario(`
         SELECT 
           p.categoria as categoria,
@@ -71,7 +69,6 @@ function Tiendas() {
         ORDER BY stock DESC
       `);
       
-      // Consulta para tendencia de ventas (últimos 6 meses)
       setConsultaVentas(`
         SELECT 
           DATE_FORMAT(v.fecha_transaccion, '%Y-%m') as periodo,
@@ -88,7 +85,6 @@ function Tiendas() {
         LIMIT 6
       `);
       
-      // Consulta para mejores vendedores
       setConsultaEmpleados(`
         SELECT 
           e.nombre_emp as nombre_empleado,
@@ -105,7 +101,6 @@ function Tiendas() {
         LIMIT 10
       `);
       
-      // Consulta para top 10 productos más vendidos
       setConsultaTopProductos(`
         SELECT 
           p.nombre_prd as nombre_producto,
@@ -122,7 +117,6 @@ function Tiendas() {
         LIMIT 10
       `);
       
-      // Consulta para 3 productos menos vendidos
       setConsultaWorstProductos(`
         SELECT 
           p.nombre_prd as nombre_producto,
@@ -140,7 +134,6 @@ function Tiendas() {
         LIMIT 3
       `);
       
-      // Consulta para ganancias por categoría
       setConsultaGanancias(`
         SELECT 
           p.categoria as categoria,
@@ -206,9 +199,48 @@ function Tiendas() {
     setCargando(false);
   };
 
+  const kpiCards = [
+    {
+      icon: Package,
+      label: 'Total Productos',
+      value: estadisticas?.total_productos || '0',
+      color: 'blue',
+      bgColor: 'bg-blue-50',
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600'
+    },
+    {
+      icon: DollarSign,
+      label: 'Valor Inventario',
+      value: `$${(estadisticas?.valor_inventario || 0).toLocaleString()}`,
+      color: 'green',
+      bgColor: 'bg-green-50',
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600'
+    },
+    {
+      icon: TrendingUp,
+      label: 'Precio Promedio',
+      value: `$${(estadisticas?.precio_promedio || 0).toFixed(2)}`,
+      color: 'purple',
+      bgColor: 'bg-purple-50',
+      iconBg: 'bg-purple-100',
+      iconColor: 'text-purple-600'
+    },
+    {
+      icon: ShoppingCart,
+      label: 'Ganancias Totales',
+      value: `$${datosGanancias.reduce((acc, g) => acc + (g.ganancia || 0), 0).toLocaleString()}`,
+      color: 'orange',
+      bgColor: 'bg-orange-50',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
+    }
+  ];
+
   return (
     <>
-      {/* Formularios ocultos para consultas */}
+      {/* Formularios ocultos */}
       {consultaTiendas && (
         <div style={{ display: 'none' }}>
           <Formulario consulta={consultaTiendas} onResultado={handleResultadoTiendas} />
@@ -250,116 +282,121 @@ function Tiendas() {
         </div>
       )}
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
-        {/* Header con selector de tienda */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-800 mb-2">Dashboard de Tiendas</h1>
-              <p className="text-gray-600">Análisis completo del rendimiento por tienda</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          
+          {/* Header Section */}
+          <div className="mb-10">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div>
+                <h1 className="text-4xl lg:text-5xl font-black text-gray-900 mb-2 tracking-tight">
+                  Cadena de tiendas "La Tripa"
+                </h1>
+                <p className="text-gray-600 text-lg">
+                  Análisis completo del rendimiento por tienda
+                </p>
+              </div>
+              
+              {/* Selector de Tienda */}
+              <div className="relative">
+                <select
+                  value={tiendaSeleccionada?.id_tienda || ''}
+                  onChange={(e) => {
+                    const tienda = tiendas.find(t => t.id_tienda === e.target.value);
+                    setTiendaSeleccionada(tienda);
+                  }}
+                  className="appearance-none bg-white border-2 border-emerald-400 text-gray-800 py-4 px-6 pr-14 rounded-2xl shadow-lg hover:border-emerald-500 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-emerald-200 transition-all duration-200 cursor-pointer text-lg font-bold min-w-[280px]"
+                >
+                  {tiendas.map((tienda) => (
+                    <option key={tienda.id_tienda} value={tienda.id_tienda}>
+                      {tienda.nombre_t}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-5 top-1/2 transform -translate-y-1/2 text-emerald-500 pointer-events-none" size={26} />
+              </div>
             </div>
-            
-            {/* Selector de Tienda */}
-            <div className="relative">
-              <select
-                value={tiendaSeleccionada?.id_tienda || ''}
-                onChange={(e) => {
-                  const tienda = tiendas.find(t => t.id_tienda === e.target.value);
-                  setTiendaSeleccionada(tienda);
-                }}
-                className="appearance-none bg-white border-2 border-emerald-500 text-gray-800 py-3 px-6 pr-12 rounded-xl shadow-lg hover:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200 transition-all duration-200 cursor-pointer text-lg font-semibold"
+
+            {/* Banner de Tienda Seleccionada */}
+            {tiendaSeleccionada && (
+              <div className="mt-8 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 rounded-3xl p-8 shadow-2xl">
+                <div className="flex items-center gap-6">
+                  <div className="bg-white/25 backdrop-blur-sm p-5 rounded-2xl">
+                    <Store size={40} className="text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black text-white mb-2">
+                      {tiendaSeleccionada.nombre_t}
+                    </h2>
+                    <p className="text-emerald-50 text-lg">
+                      {tiendaSeleccionada.direccion_t || 'Dirección no disponible'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {kpiCards.map((card, index) => (
+              <div
+                key={index}
+                className={`${card.bgColor} rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100`}
               >
-                {tiendas.map((tienda) => (
-                  <option key={tienda.id_tienda} value={tienda.id_tienda}>
-                    {tienda.nombre_t}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-emerald-500 pointer-events-none" size={24} />
-            </div>
-          </div>
-
-          {/* Info de la tienda seleccionada */}
-          {tiendaSeleccionada && (
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 shadow-xl text-white">
-              <div className="flex items-center gap-4">
-                <div className="bg-white/20 p-4 rounded-xl">
-                  <Store size={32} />
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`${card.iconBg} p-4 rounded-xl`}>
+                    <card.icon className={card.iconColor} size={28} strokeWidth={2.5} />
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold">{tiendaSeleccionada.nombre_t}</h2>
-                  <p className="text-emerald-100">{tiendaSeleccionada.direccion_t || 'Dirección no disponible'}</p>
-                </div>
+                <h3 className="text-gray-600 text-sm font-bold uppercase tracking-wide mb-2">
+                  {card.label}
+                </h3>
+                <p className="text-3xl font-black text-gray-900">
+                  {cargando ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    card.value
+                  )}
+                </p>
               </div>
-            </div>
-          )}
-        </div>
-
-        {/* Tarjetas de estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <Package className="text-blue-600" size={24} />
-              </div>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Total Productos</h3>
-            <p className="text-3xl font-bold text-gray-800">
-              {cargando ? '...' : estadisticas?.total_productos || '0'}
-            </p>
+            ))}
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-green-100 p-3 rounded-xl">
-                <DollarSign className="text-green-600" size={24} />
+          {/* Sección de Gráficos */}
+          <div className="space-y-8">
+            
+            {/* Fila 1: Inventario y Ventas */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <InventoryChart data={datosInventario} />
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <SalesTrendChart data={datosVentas} />
               </div>
             </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Valor Inventario</h3>
-            <p className="text-3xl font-bold text-gray-800">
-              {cargando ? '...' : `$${estadisticas?.valor_inventario?.toLocaleString() || '0'}`}
-            </p>
-          </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-purple-100 p-3 rounded-xl">
-                <TrendingUp className="text-purple-600" size={24} />
+            {/* Fila 2: Empleados y Ganancias */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <EmployeeSalesChart data={datosEmpleados} />
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <ProfitDonutChart data={datosGanancias} />
               </div>
             </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Precio Promedio</h3>
-            <p className="text-3xl font-bold text-gray-800">
-              {cargando ? '...' : `$${estadisticas?.precio_promedio?.toFixed(2) || '0'}`}
-            </p>
-          </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-orange-100 p-3 rounded-xl">
-                <ShoppingCart className="text-orange-600" size={24} />
+            {/* Fila 3: Top y Worst Products */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <TopProductsChart data={datosTopProductos} />
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <WorstProductsChart data={datosWorstProductos} />
               </div>
             </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Ganancias Totales</h3>
-            <p className="text-3xl font-bold text-gray-800">
-              {cargando ? '...' : `$${datosGanancias.reduce((acc, g) => acc + (g.ganancia || 0), 0).toLocaleString()}`}
-            </p>
+
           </div>
-        </div>
-
-        {/* Gráficos principales */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <InventoryChart data={datosInventario} />
-          <SalesTrendChart data={datosVentas} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <EmployeeSalesChart data={datosEmpleados} />
-          <ProfitDonutChart data={datosGanancias} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <TopProductsChart data={datosTopProductos} />
-          <WorstProductsChart data={datosWorstProductos} />
         </div>
       </div>
     </>

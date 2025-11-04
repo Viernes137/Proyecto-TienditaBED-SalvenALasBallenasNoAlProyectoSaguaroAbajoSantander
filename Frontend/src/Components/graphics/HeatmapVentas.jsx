@@ -25,7 +25,7 @@ export default function HeatmapVentas() {
   }, [mes, año]);
 
   const procesarDatos = (resultado) => {
-    console.log('Datos recibidos:', resultado); 
+    console.log('Datos recibidos:', resultado); // Debug
     if (resultado && resultado.length > 0) {
       setDatos(resultado);
     } else {
@@ -36,23 +36,27 @@ export default function HeatmapVentas() {
   };
 
   const obtenerColor = (valor) => {
-    if (!valor || valor === 0) return '#F3F4F6';
+    if (!valor || valor === 0) return '#F1F5F9'; // Gris muy claro
     const max = Math.max(...datos.map(d => d.num_ventas));
     const intensidad = (valor / max) * 100;
     
-    if (intensidad < 20) return '#FEF3C7';
-    if (intensidad < 40) return '#FDE047';
-    if (intensidad < 60) return '#FACC15';
-    if (intensidad < 80) return '#F59E0B';
-    return '#EA580C';
+    // Paleta verde-esmeralda-turquesa (más profesional y agradable)
+    if (intensidad < 15) return '#D1FAE5'; // Verde muy claro
+    if (intensidad < 30) return '#A7F3D0'; // Verde claro
+    if (intensidad < 45) return '#6EE7B7'; // Verde medio
+    if (intensidad < 60) return '#34D399'; // Verde esmeralda
+    if (intensidad < 75) return '#10B981'; // Esmeralda fuerte
+    if (intensidad < 90) return '#059669'; // Esmeralda oscuro
+    return '#047857'; // Verde oscuro intenso
   };
 
   const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
+  // Crear matriz del calendario - CORREGIDO
   const crearCalendario = () => {
-    const diasEnMes = new Date(año, mes, 0).getDate(); 
+    const diasEnMes = new Date(año, mes, 0).getDate(); // Correcto: mes sin -1 da el último día
     const primerDia = new Date(año, mes - 1, 1).getDay(); // Primer día del mes
     
     const semanas = [];
@@ -139,13 +143,13 @@ export default function HeatmapVentas() {
         </div>
       ) : (
         <>
-          <div className="bg-gradient-to-r from-orange-100 to-yellow-100 px-4 py-2 rounded-lg mb-4 inline-block">
+          <div className="bg-gradient-to-r from-emerald-100 to-teal-100 px-4 py-2 rounded-lg mb-4 inline-block">
             <p className="text-xs text-gray-600">Promedio diario</p>
-            <p className="text-lg font-bold text-orange-600">{promedioVentas} ventas</p>
+            <p className="text-lg font-bold text-emerald-700">{promedioVentas} ventas</p>
           </div>
           
           {/* Calendario */}
-          <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-lg p-4 border border-gray-200">
             {/* Encabezado días de la semana */}
             <div className="grid grid-cols-7 gap-2 mb-2">
               {diasSemana.map(dia => (
@@ -162,8 +166,8 @@ export default function HeatmapVentas() {
                   {semana.map((dia, indexDia) => (
                     <div
                       key={indexDia}
-                      className={`aspect-square rounded-lg flex flex-col items-center justify-center text-sm font-medium transition-all duration-200 ${
-                        dia ? 'hover:scale-110 hover:shadow-md cursor-pointer' : ''
+                      className={`aspect-square rounded-lg flex flex-col items-center justify-center text-sm font-medium transition-all duration-200 shadow-sm ${
+                        dia ? 'hover:scale-110 hover:shadow-lg cursor-pointer border border-gray-200' : ''
                       }`}
                       style={{ 
                         backgroundColor: dia ? obtenerColor(dia.ventas) : 'transparent',
@@ -172,9 +176,9 @@ export default function HeatmapVentas() {
                     >
                       {dia && (
                         <>
-                          <span className="text-xs text-gray-700">{dia.dia}</span>
+                          <span className="text-xs font-bold text-gray-700">{dia.dia}</span>
                           {dia.ventas > 0 && (
-                            <span className="text-xs font-bold text-gray-800 mt-0.5">
+                            <span className="text-[10px] font-black text-gray-900 mt-0.5 bg-white/60 px-1.5 py-0.5 rounded">
                               {dia.ventas}
                             </span>
                           )}
@@ -189,18 +193,27 @@ export default function HeatmapVentas() {
           
           {/* Leyenda */}
           <div className="flex items-center justify-center mt-4 space-x-2 text-xs text-gray-600">
-            <span>Menos</span>
+            <span className="font-medium">Menos</span>
             <div className="flex space-x-1">
-              {['#F3F4F6', '#FEF3C7', '#FDE047', '#FACC15', '#F59E0B', '#EA580C'].map((color, i) => (
+              {[
+                { color: '#F1F5F9', label: 'Sin ventas' },
+                { color: '#D1FAE5', label: '0-15%' },
+                { color: '#A7F3D0', label: '15-30%' },
+                { color: '#6EE7B7', label: '30-45%' },
+                { color: '#34D399', label: '45-60%' },
+                { color: '#10B981', label: '60-75%' },
+                { color: '#059669', label: '75-90%' },
+                { color: '#047857', label: '90-100%' }
+              ].map((item) => (
                 <div 
-                  key={color} 
-                  className="w-6 h-4 rounded border border-gray-200" 
-                  style={{ backgroundColor: color }}
-                  title={i === 0 ? 'Sin ventas' : `${i * 20}% del máximo`}
+                  key={item.color} 
+                  className="w-7 h-5 rounded border border-gray-300 shadow-sm" 
+                  style={{ backgroundColor: item.color }}
+                  title={item.label}
                 ></div>
               ))}
             </div>
-            <span>Más</span>
+            <span className="font-medium">Más</span>
           </div>
           
           {/* Stats rápidas */}
